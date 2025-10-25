@@ -1,0 +1,15 @@
+:root {
+  --telegram-blue: #0088cc;
+  --telegram-light: #ebf5fe;
+  --telegram-dark: #1a1a1a;
+  --telegram-gray: #f0f0f0;
+  --accent-orange: #ff6b35;
+}
+
+.telegram-theme {
+  background: linear-gradient(135deg, var(--telegram-light) 0%, #ffffff 100%);
+}
+
+.dark .telegram-theme {
+  background: linear-gradient(135deg, var(--telegram-dark) 0%, #2d3748 100%);
+}
