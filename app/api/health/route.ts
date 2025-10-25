@@ -1,19 +1,15 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const healthCheck = {
+  return NextResponse.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    memory: process.memoryUsage(),
+    service: 'GenZ Day API',
     version: '1.0.0',
-    services: {
-      database: 'connected',
-      storage: 'ready',
-      authentication: 'demo-mode',
-      api: 'operational'
+    endpoints: {
+      posts: '/api/posts',
+      upload: '/api/upload',
+      health: '/api/health'
     }
-  };
-
-  return NextResponse.json(healthCheck);
+  });
 }
