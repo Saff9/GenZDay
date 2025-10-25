@@ -6,7 +6,7 @@ export default function PostFeed() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Demo posts in case API fails
+  // Demo posts
   const demoPosts = [
     {
       id: '1',
@@ -35,22 +35,11 @@ export default function PostFeed() {
   ];
 
   useEffect(() => {
-    const loadPosts = async () => {
-      try {
-        const response = await fetch('/api/posts');
-        if (response.ok) {
-          const data = await response.json();
-          setPosts(data.data || data || demoPosts);
-        } else {
-          setPosts(demoPosts);
-        }
-      } catch (error) {
-        setPosts(demoPosts);
-      }
+    // Simulate API call
+    setTimeout(() => {
+      setPosts(demoPosts);
       setLoading(false);
-    };
-
-    loadPosts();
+    }, 1000);
   }, []);
 
   const handleLike = (postId: string) => {
