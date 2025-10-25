@@ -1,25 +1,41 @@
 import { NextResponse } from 'next/server';
-import { getXataClient } from '@/lib/xata';
-
-const xata = getXataClient();
+import { xata } from '@/lib/db';
+import { ApiResponse } from '@/lib/types';
 
 export async function GET(request: Request) {
+  // Verify cron secret
   if (request.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    );
   }
 
   try {
-    const expiredPosts = await xata.db.posts
-      .filter({ expires_at: { $lt: new Date() } })
-      .getMany();
-    
     // Delete expired posts
+    const expiredPosts = await xata.db.posts
+      .filter({ expiresAt: { $lt: new Date() } })
+      .getAll();
+
+    let deletedCount = 0;
+    
     for (const post of expiredPosts) {
       await xata.db.posts.delete(post.id);
+      deletedCount++;
     }
-    
-    return NextResponse.json({ deleted: expiredPosts.length });
+
+    const response: ApiResponse<{ deleted: number }> = {
+      success: true,
+      data: { deleted: deletedCount },
+      message: `Cleaned up ${deletedCount} expired posts`,
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
-    return NextResponse.json({ error: 'Cleanup failed' }, { status: 500 });
+    console.error('Error cleaning up expired posts:', error);
+    return NextResponse.json(
+      { success: false, error: 'Cleanup failed' },
+      { status: 500 }
+    );
   }
 }
