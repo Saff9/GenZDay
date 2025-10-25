@@ -6,19 +6,16 @@ export default function StoriesBar() {
     { id: 2, user: 'Alex', hasNew: true },
     { id: 3, user: 'Sarah', hasNew: false },
     { id: 4, user: 'Mike', hasNew: true },
-    { id: 5, user: 'Emma', hasNew: false },
   ];
 
   return (
     <div className="flex space-x-4 overflow-x-auto pb-4">
       {stories.map((story) => (
         <div key={story.id} className="flex flex-col items-center space-y-2">
-          <div className={`story-ring ${story.hasNew ? 'animate-pulse-slow' : ''}`}>
-            <div className="w-16 h-16 bg-gradient-to-r from-telegram-blue to-whatsapp-green rounded-full flex items-center justify-center text-white font-bold border-2 border-white">
-              {story.isMe ? '➕' : story.user[0]}
-            </div>
+          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold border-2 border-white">
+            {story.isMe ? '➕' : story.user[0]}
           </div>
-          <span className="text-xs text-telegram-text-secondary">
+          <span className="text-xs text-gray-600">
             {story.isMe ? 'Your Story' : story.user}
           </span>
         </div>
