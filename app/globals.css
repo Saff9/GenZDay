@@ -6,6 +6,9 @@
   --telegram-blue: #0088cc;
   --telegram-blue-dark: #006ea6;
   --telegram-light: #ebf5fe;
+  --telegram-dark: #1a1a1a;
+  --accent-orange: #ff6b35;
+  --accent-purple: #8b5cf6;
 }
 
 body {
@@ -13,12 +16,15 @@ body {
   min-height: 100vh;
 }
 
-.telegram-gradient {
-  background: linear-gradient(135deg, #0088cc 0%, #00a2d6 100%);
-}
-
 .glass-effect {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #0088cc 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
