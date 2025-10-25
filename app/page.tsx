@@ -4,221 +4,238 @@ import { useState } from 'react';
 
 export default function Home() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const [caption, setCaption] = useState('');
-  const [preview, setPreview] = useState<string>('');
+  const [activeTab, setActiveTab] = useState('feed');
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setPreview(URL.createObjectURL(selectedFile));
+  // Sample posts data
+  const samplePosts = [
+    {
+      id: 1,
+      user: { name: 'Alex Johnson', avatar: 'AJ', online: true },
+      time: '2 min ago',
+      content: 'Just discovered this amazing platform! The 7-day expiry is genius 🔥',
+      media: null,
+      likes: 12,
+      comments: 3,
+      expiresIn: '6d 23h'
+    },
+    {
+      id: 2,
+      user: { name: 'Sarah Miller', avatar: 'SM', online: false },
+      time: '1 hour ago',
+      content: 'Beautiful sunset from my window today 🌅',
+      media: 'sunset',
+      likes: 45,
+      comments: 8,
+      expiresIn: '6d 22h'
     }
-  };
-
-  const handleUpload = async () => {
-    if (!file) return;
-
-    try {
-      // Upload file
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const uploadResponse = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const uploadData = await uploadResponse.json();
-
-      if (uploadData.success) {
-        // Create post
-        const postResponse = await fetch('/api/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            mediaUrl: uploadData.data.url,
-            mediaType: file.type.startsWith('image/') ? 'image' : 'video',
-            caption: caption
-          }),
-        });
-
-        const postData = await postResponse.json();
-
-        if (postData.success) {
-          alert('Posted successfully! 🎉');
-          setIsUploadModalOpen(false);
-          setFile(null);
-          setCaption('');
-          setPreview('');
-        }
-      }
-    } catch (error) {
-      alert('Upload failed. Please try again.');
-    }
-  };
+  ];
 
   return (
-    <>
-      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-        {/* Header */}
-        <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">GZ</span>
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    GenZ Day
-                  </h1>
-                  <p className="text-sm text-gray-500">Ephemeral social sharing</p>
-                </div>
+    <div className="flex-1 flex flex-col min-h-0">
+      {/* Mobile Header */}
+      <header className="telegram-header p-4 md:hidden">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold">GZ</span>
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-white">GenZ Day</h1>
+              <p className="text-white/80 text-sm">12 online</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => setIsUploadModalOpen(true)}
+            className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-lg transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Tabs */}
+      <div className="flex border-b border-[#e6e6e6] bg-white md:hidden">
+        <button 
+          className={`flex-1 py-3 text-center font-medium transition-colors ${
+            activeTab === 'feed' ? 'text-[#0088cc] border-b-2 border-[#0088cc]' : 'text-[#707579]'
+          }`}
+          onClick={() => setActiveTab('feed')}
+        >
+          Feed
+        </button>
+        <button 
+          className={`flex-1 py-3 text-center font-medium transition-colors ${
+            activeTab === 'stories' ? 'text-[#0088cc] border-b-2 border-[#0088cc]' : 'text-[#707579]'
+          }`}
+          onClick={() => setActiveTab('stories')}
+        >
+          Stories
+        </button>
+        <button 
+          className={`flex-1 py-3 text-center font-medium transition-colors ${
+            activeTab === 'chats' ? 'text-[#0088cc] border-b-2 border-[#0088cc]' : 'text-[#707579]'
+          }`}
+          onClick={() => setActiveTab('chats')}
+        >
+          Chats
+        </button>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-2xl mx-auto p-4 space-y-4">
+          {/* Create Post Card */}
+          <div className="telegram-card p-4 animate-fade-in">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-[#0088cc] to-[#25d366] rounded-full flex items-center justify-center text-white font-bold">
+                YT
               </div>
-              
-              <button
+              <button 
                 onClick={() => setIsUploadModalOpen(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 flex items-center space-x-2"
+                className="flex-1 bg-[#f5f5f5] hover:bg-[#e5e5e5] text-[#707579] rounded-full py-3 px-4 text-left transition-colors"
               >
+                What's happening? Share a moment...
+              </button>
+            </div>
+            <div className="flex justify-around border-t border-[#e6e6e6] pt-3">
+              <button className="flex items-center space-x-2 text-[#707579] hover:text-[#0088cc] transition-colors">
                 <span>📸</span>
-                <span>Create Post</span>
+                <span>Photo/Video</span>
+              </button>
+              <button className="flex items-center space-x-2 text-[#707579] hover:text-[#25d366] transition-colors">
+                <span>🎵</span>
+                <span>Music</span>
+              </button>
+              <button className="flex items-center space-x-2 text-[#707579] hover:text-[#ff6b35] transition-colors">
+                <span>📍</span>
+                <span>Location</span>
               </button>
             </div>
           </div>
-        </header>
 
-        {/* Hero Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center mb-16">
-            <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
-              GenZ Day
-            </h1>
-            <p className="text-2xl text-gray-600 mb-8">
-              Your moments, your week, your way ✨
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                <div className="text-3xl mb-4">📸</div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Upload & Share</h3>
-                <p className="text-gray-600">Post photos and videos that disappear in 7 days</p>
+          {/* Sample Posts */}
+          {samplePosts.map((post) => (
+            <div key={post.id} className="telegram-card p-4 animate-fade-in">
+              {/* Post Header */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm">
+                      {post.user.avatar}
+                    </div>
+                    {post.user.online && <div className="online-indicator"></div>}
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#000000]">{post.user.name}</p>
+                    <p className="text-sm text-[#707579]">{post.time}</p>
+                  </div>
+                </div>
+                <div className="bg-[#0088cc] text-white px-2 py-1 rounded-full text-xs font-medium">
+                  {post.expiresIn}
+                </div>
               </div>
-              
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                <div className="text-3xl mb-4">⏰</div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">7-Day Magic</h3>
-                <p className="text-gray-600">Content automatically vanishes after one week</p>
-              </div>
-              
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                <div className="text-3xl mb-4">🎯</div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">GenZ Focused</h3>
-                <p className="text-gray-600">Built for the next generation of social media</p>
+
+              {/* Post Content */}
+              <p className="text-[#000000] mb-3">{post.content}</p>
+
+              {/* Post Media */}
+              {post.media && (
+                <div className="mb-3 rounded-lg overflow-hidden">
+                  <div className="bg-gradient-to-br from-blue-100 to-purple-100 h-48 flex items-center justify-center">
+                    <span className="text-[#707579]">📸 Media Content</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Post Actions */}
+              <div className="flex items-center justify-between pt-3 border-t border-[#e6e6e6]">
+                <div className="flex space-x-4">
+                  <button className="flex items-center space-x-1 text-[#707579] hover:text-red-500 transition-colors">
+                    <span>❤️</span>
+                    <span className="text-sm">{post.likes}</span>
+                  </button>
+                  <button className="flex items-center space-x-1 text-[#707579] hover:text-[#0088cc] transition-colors">
+                    <span>💬</span>
+                    <span className="text-sm">{post.comments}</span>
+                  </button>
+                  <button className="flex items-center space-x-1 text-[#707579] hover:text-[#25d366] transition-colors">
+                    <span>🔄</span>
+                  </button>
+                </div>
+                <button className="text-[#707579] hover:text-[#0088cc] transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                  </svg>
+                </button>
               </div>
             </div>
+          ))}
 
-            <button
+          {/* Welcome Card */}
+          <div className="telegram-card p-6 text-center animate-fade-in">
+            <div className="w-20 h-20 bg-gradient-to-r from-[#0088cc] to-[#25d366] rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-4">
+              🎉
+            </div>
+            <h2 className="text-xl font-bold text-[#000000] mb-2">Welcome to GenZ Day!</h2>
+            <p className="text-[#707579] mb-4">
+              Share moments that disappear in 7 days. Connect with friends in real-time with our unique ephemeral social experience.
+            </p>
+            <button 
               onClick={() => setIsUploadModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-2xl text-lg transition-all duration-200 transform hover:scale-105 mb-4"
+              className="telegram-button px-6 py-3 font-medium"
             >
-              🚀 Start Sharing Now
+              Create Your First Post
             </button>
           </div>
-
-          {/* Demo Posts */}
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
-              <div className="p-4 border-b border-gray-100">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                      GZ
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-800">GenZ User</p>
-                      <p className="text-sm text-gray-500">Just now</p>
-                    </div>
-                  </div>
-                  <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                    7d left
-                  </div>
-                </div>
-              </div>
-              <div className="p-4">
-                <p className="text-gray-800 mb-4">Welcome to GenZ Day! This is what your posts will look like. 🎉</p>
-                <div className="bg-gray-100 rounded-lg h-48 flex items-center justify-center">
-                  <p className="text-gray-500">Your image/video will appear here</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-      </main>
+      </div>
 
       {/* Upload Modal */}
       {isUploadModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Create Post</h2>
-            
-            {/* Preview */}
-            {preview && (
-              <div className="mb-4">
-                {file?.type.startsWith('image/') ? (
-                  <img src={preview} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
-                ) : (
-                  <video src={preview} controls className="w-full h-48 object-cover rounded-lg" />
-                )}
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="telegram-card w-full max-w-md">
+            <div className="p-4 border-b border-[#e6e6e6]">
+              <h2 className="text-xl font-bold text-[#000000]">Create Post</h2>
+            </div>
+            <div className="p-4">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-[#0088cc] to-[#25d366] rounded-full flex items-center justify-center text-white font-bold">
+                  YT
+                </div>
+                <div>
+                  <p className="font-medium text-[#000000]">Your Name</p>
+                  <p className="text-sm text-[#707579]">Post will expire in 7 days</p>
+                </div>
               </div>
-            )}
+              
+              <textarea 
+                placeholder="What's happening? Share your moment..."
+                className="w-full h-32 p-3 border border-[#e6e6e6] rounded-lg resize-none focus:outline-none focus:border-[#0088cc]"
+              />
 
-            {/* Upload Area */}
-            {!preview && (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  id="file-upload"
-                />
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <div className="text-4xl mb-2">📸</div>
-                  <p className="text-gray-600">Click to upload photo or video</p>
-                  <p className="text-sm text-gray-400 mt-1">Supports JPEG, PNG, MP4</p>
-                </label>
+              <div className="border-2 border-dashed border-[#e6e6e6] rounded-lg p-8 text-center mt-4">
+                <div className="text-4xl text-[#707579] mb-2">📸</div>
+                <p className="text-[#707579]">Add photos or video</p>
+                <p className="text-sm text-[#707579] mt-1">Drag and drop or click to browse</p>
               </div>
-            )}
 
-            {/* Caption */}
-            <textarea
-              placeholder="Add a caption... (optional)"
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg mb-4 resize-none"
-              rows={3}
-            />
-
-            {/* Buttons */}
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setIsUploadModalOpen(false)}
-                className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUpload}
-                disabled={!file}
-                className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-              >
-                Post Now
-              </button>
+              <div className="flex space-x-3 mt-6">
+                <button 
+                  onClick={() => setIsUploadModalOpen(false)}
+                  className="flex-1 py-3 border border-[#e6e6e6] text-[#707579] rounded-lg font-medium hover:bg-[#f5f5f5] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button className="flex-1 py-3 bg-[#0088cc] text-white rounded-lg font-medium hover:bg-[#006ea6] transition-colors">
+                  Post Now
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
