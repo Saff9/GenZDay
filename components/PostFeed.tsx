@@ -1,49 +1,47 @@
-const fetchPosts = async () => {
-  try {
-    const response = await fetch('/api/posts');
-    const data = await response.json();
-    
-    if (data.success) {
-      setPosts(data.data);
-    } else {
-      // Fallback to sample data if API fails
-      console.log('Using fallback sample data');
-      setPosts([
-        {
-          id: '1',
+useEffect(() => {
+  const fetchPosts = async () => {
+    try {
+      const response = await fetch('/api/posts');
+      const data = await response.json();
+      
+      if (data.success) {
+        setPosts(data.data);
+      } else {
+        // Fallback
+        setPosts([{
+          id: 'fallback',
           userId: '1',
-          mediaUrl: 'https://placehold.co/600x400/0088cc/white?text=Welcome+to+GenZ+Day+🎉',
+          mediaUrl: 'https://placehold.co/600x400/0088cc/white?text=Demo+Post',
           mediaType: 'image',
-          caption: 'Welcome to GenZ Day! Your moments disappear in 7 days ⏰',
+          caption: 'This is a demo post. Create your own!',
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
           createdAt: new Date().toISOString(),
-          views: 156,
-          user: { name: 'GenZ Team', avatar: 'GZ' },
-          likes: 23,
-          comments: 5,
+          views: 100,
+          user: { name: 'Demo', avatar: 'DM' },
+          likes: 10,
+          comments: 2,
           isLiked: false
-        }
-      ]);
-    }
-  } catch (error) {
-    console.error('Failed to fetch posts, using sample data');
-    // Fallback sample post
-    setPosts([
-      {
-        id: 'fallback-1',
+        }]);
+      }
+    } catch (error) {
+      console.log('Using demo data due to error');
+      setPosts([{
+        id: 'demo',
         userId: '1',
-        mediaUrl: 'https://placehold.co/600x400/25d366/white?text=Demo+Post+📸',
+        mediaUrl: 'https://placehold.co/600x400/25d366/white?text=GenZ+Day+Demo',
         mediaType: 'image',
-        caption: 'This is a demo post. Create your own to see it here!',
+        caption: 'Welcome to GenZ Day! Create posts that last 7 days.',
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         createdAt: new Date().toISOString(),
-        views: 89,
-        user: { name: 'Demo User', avatar: 'DU' },
-        likes: 15,
-        comments: 2,
+        views: 150,
+        user: { name: 'Welcome Bot', avatar: 'WB' },
+        likes: 25,
+        comments: 3,
         isLiked: false
-      }
-    ]);
-  }
-  setLoading(false);
-};
+      }]);
+    }
+    setLoading(false);
+  };
+
+  fetchPosts();
+}, []);
