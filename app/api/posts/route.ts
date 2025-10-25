@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 
-// In-memory storage for demo (replace with database later)
+// Demo data - will be replaced with database
 let posts = [
   {
     id: '1',
-    userId: '1', 
+    userId: '1',
     mediaUrl: 'https://placehold.co/600x400/0088cc/white?text=Welcome+To+GenZ+Day+🎉',
     mediaType: 'image' as const,
     caption: 'Welcome to GenZ Day! Share moments that disappear in 7 days ⏰',
@@ -18,7 +18,7 @@ let posts = [
   },
   {
     id: '2',
-    userId: '2',
+    userId: '2', 
     mediaUrl: 'https://placehold.co/600x400/25d366/white?text=Beach+Day+🏖️',
     mediaType: 'image' as const,
     caption: 'Perfect weather for the beach! ☀️',
@@ -34,12 +34,15 @@ let posts = [
 
 export async function GET() {
   try {
+    console.log('GET /api/posts - Returning', posts.length, 'posts');
+    
     return NextResponse.json({
       success: true,
       data: posts,
       message: "Posts fetched successfully"
     });
   } catch (error) {
+    console.error('GET /api/posts error:', error);
     return NextResponse.json({
       success: false,
       error: 'Failed to fetch posts',
@@ -50,7 +53,10 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { mediaUrl, mediaType, caption } = await request.json();
+    const body = await request.json();
+    const { mediaUrl, mediaType, caption } = body;
+
+    console.log('POST /api/posts - Creating post:', { mediaUrl, mediaType, caption });
 
     if (!mediaUrl || !mediaType) {
       return NextResponse.json({
@@ -76,12 +82,15 @@ export async function POST(request: Request) {
 
     posts.unshift(newPost);
 
+    console.log('POST /api/posts - Created:', newPost.id);
+
     return NextResponse.json({
       success: true,
       data: newPost,
       message: "Post created successfully"
     });
   } catch (error) {
+    console.error('POST /api/posts error:', error);
     return NextResponse.json({
       success: false,
       error: 'Failed to create post'
