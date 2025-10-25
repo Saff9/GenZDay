@@ -1,70 +1,87 @@
 export default function Home() {
   return (
-    <main className="min-h-screen p-8">
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-8">
       <div className="max-w-4xl mx-auto text-center">
         {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-6xl font-bold gradient-text mb-4">
+        <div className="mb-12 pt-12">
+          <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
             GenZ Day
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
+          <p className="text-2xl text-gray-600 mb-8">
             Your moments, your week, your way ✨
           </p>
         </div>
 
-        {/* Main Content */}
-        <div className="glass-effect rounded-2xl p-8 shadow-lg mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
-            🚀 Welcome to GenZ Day!
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-              <div className="text-2xl mb-2">📸</div>
-              <h3 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">Upload Media</h3>
-              <p className="text-sm text-blue-600 dark:text-blue-400">Share photos and videos that last 7 days</p>
-            </div>
-            
-            <div className="p-6 bg-green-50 dark:bg-green-900/20 rounded-xl">
-              <div className="text-2xl mb-2">⏰</div>
-              <h3 className="font-semibold text-green-800 dark:text-green-300 mb-2">7-Day Expiry</h3>
-              <p className="text-sm text-green-600 dark:text-green-400">Content automatically disappears after a week</p>
-            </div>
-            
-            <div className="p-6 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
-              <div className="text-2xl mb-2">🔒</div>
-              <h3 className="font-semibold text-purple-800 dark:text-purple-300 mb-2">Secure & Private</h3>
-              <p className="text-sm text-purple-600 dark:text-purple-400">Your data is protected and encrypted</p>
-            </div>
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <div className="text-3xl mb-4">📸</div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Upload & Share</h3>
+            <p className="text-gray-600">Post photos and videos that disappear in 7 days</p>
           </div>
-
-          <div className="space-y-4">
-            <button className="telegram-button text-lg">
-              Get Started - It's Free
-            </button>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              No credit card required. Join thousands of GenZ users!
-            </p>
+          
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <div className="text-3xl mb-4">⏰</div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">7-Day Magic</h3>
+            <p className="text-gray-600">Content automatically vanishes after one week</p>
+          </div>
+          
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <div className="text-3xl mb-4">🎯</div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">GenZ Focused</h3>
+            <p className="text-gray-600">Built for the next generation of social media</p>
           </div>
         </div>
 
-        {/* API Status */}
-        <div className="glass-effect rounded-2xl p-6">
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-            API Status
-          </h3>
-          <div className="flex justify-center space-x-4">
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-              <span className="text-sm">Backend: Online</span>
+        {/* CTA Buttons */}
+        <div className="space-y-4">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-2xl text-lg transition-all duration-200 transform hover:scale-105">
+            🚀 Start Sharing Now
+          </button>
+          <div>
+            <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl text-md mr-4">
+              📱 Mobile App
+            </button>
+            <button className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-xl text-md">
+              👥 Join Community
+            </button>
+          </div>
+        </div>
+
+        {/* Live Demo */}
+        <div className="mt-16 bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">Live Demo</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-xl font-semibold mb-4">Test the API</h3>
+              <div className="space-y-3 text-left">
+                <a href="/api/health" className="block p-3 bg-green-100 rounded-lg hover:bg-green-200 transition-colors">
+                  ✅ Health Check
+                </a>
+                <a href="/api/posts" className="block p-3 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors">
+                  📝 Posts API
+                </a>
+                <a href="/api/upload" className="block p-3 bg-purple-100 rounded-lg hover:bg-purple-200 transition-colors">
+                  📤 Upload API
+                </a>
+              </div>
             </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-              <span className="text-sm">Database: Connected</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-              <span className="text-sm">Storage: Ready</span>
+            <div>
+              <h3 className="text-xl font-semibold mb-4">App Status</h3>
+              <div className="space-y-2 text-left">
+                <div className="flex items-center text-green-600">
+                  <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                  Backend API: Running
+                </div>
+                <div className="flex items-center text-green-600">
+                  <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                  Database: Connected
+                </div>
+                <div className="flex items-center text-blue-600">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                  Frontend: Ready for Development
+                </div>
+              </div>
             </div>
           </div>
         </div>
