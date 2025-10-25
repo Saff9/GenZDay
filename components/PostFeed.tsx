@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 
 interface Post {
   id: string;
@@ -24,46 +23,55 @@ interface Post {
 export default function PostFeed() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const { data: session } = useSession();
 
+  // Sample posts for demo
   useEffect(() => {
-    fetchPosts();
+    const samplePosts: Post[] = [
+      {
+        id: '1',
+        userId: '1',
+        mediaUrl: 'https://placehold.co/600x400/0088cc/white?text=Beautiful+Sunset',
+        mediaType: 'image',
+        caption: 'Just discovered this amazing platform! The 7-day expiry is genius 🔥',
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        createdAt: new Date().toISOString(),
+        views: 124,
+        user: { name: 'Alex Johnson' },
+        likes: 12,
+        comments: 3,
+        isLiked: false
+      },
+      {
+        id: '2',
+        userId: '2',
+        mediaUrl: 'https://placehold.co/600x400/25d366/white?text=Beach+Vibes',
+        mediaType: 'image',
+        caption: 'Perfect day at the beach! 🏖️',
+        expiresAt: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString(),
+        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        views: 89,
+        user: { name: 'Sarah Miller' },
+        likes: 45,
+        comments: 8,
+        isLiked: true
+      }
+    ];
+
+    setPosts(samplePosts);
+    setLoading(false);
   }, []);
 
-  const fetchPosts = async () => {
-    try {
-      const response = await fetch('/api/posts');
-      const data = await response.json();
-      if (data.success) {
-        setPosts(data.data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch posts');
-    }
-    setLoading(false);
-  };
-
   const handleLike = async (postId: string) => {
-    try {
-      const response = await fetch(`/api/posts/${postId}/like`, {
-        method: 'POST',
-      });
-      const data = await response.json();
-      if (data.success) {
-        // Update local state
-        setPosts(posts.map(post => 
-          post.id === postId 
-            ? { 
-                ...post, 
-                isLiked: data.data.liked,
-                likes: data.data.liked ? (post.likes || 0) + 1 : (post.likes || 1) - 1
-              }
-            : post
-        ));
-      }
-    } catch (error) {
-      console.error('Failed to like post');
-    }
+    // Simple like toggle for demo
+    setPosts(posts.map(post => 
+      post.id === postId 
+        ? { 
+            ...post, 
+            isLiked: !post.isLiked,
+            likes: post.isLiked ? (post.likes || 1) - 1 : (post.likes || 0) + 1
+          }
+        : post
+    ));
   };
 
   const calculateTimeLeft = (expiresAt: string) => {
@@ -76,8 +84,8 @@ export default function PostFeed() {
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     
-    if (days > 0) return `${days}d ${hours}h`;
-    return `${hours}h`;
+    if (days > 0) return `${days}d ${hours}h left`;
+    return `${hours}h left`;
   };
 
   if (loading) {
@@ -98,7 +106,7 @@ export default function PostFeed() {
         </div>
       ) : (
         posts.map((post) => (
-          <div key={post.id} className="telegram-card overflow-hidden">
+          <div key={post.id} className="telegram-card overflow-hidden animate-fade-in">
             {/* Post Header */}
             <div className="p-4 border-b border-telegram-border">
               <div className="flex items-center justify-between">
@@ -109,7 +117,7 @@ export default function PostFeed() {
                   <div>
                     <p className="font-medium text-telegram-text">{post.user?.name || 'Anonymous'}</p>
                     <p className="text-sm text-telegram-text-secondary">
-                      {new Date(post.createdAt).toLocaleDateString()} • {calculateTimeLeft(post.expiresAt)} left
+                      {new Date(post.createdAt).toLocaleDateString()} • {calculateTimeLeft(post.expiresAt)}
                     </p>
                   </div>
                 </div>
