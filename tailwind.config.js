@@ -13,11 +13,6 @@ module.exports = {
           'blue-dark': '#006ea6',
           light: '#ebf5fe',
           dark: '#1a1a1a',
-          gray: '#f0f0f0',
-        },
-        accent: {
-          orange: '#ff6b35',
-          purple: '#8b5cf6',
         }
       },
     },
