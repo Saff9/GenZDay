@@ -13,10 +13,10 @@ export default function QuickActions() {
       {actions.map((action, index) => (
         <button
           key={index}
-          className="telegram-card p-4 text-center hover:bg-telegram-border transition-colors"
+          className="bg-white rounded-xl p-4 text-center shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
         >
           <div className={`text-2xl mb-2 ${action.color}`}>{action.icon}</div>
-          <div className="text-sm font-medium text-telegram-text">{action.label}</div>
+          <div className="text-sm font-medium text-gray-900">{action.label}</div>
         </button>
       ))}
     </div>
