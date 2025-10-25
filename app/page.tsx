@@ -1,70 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { useState } from 'react';
 import PostFeed from '@/components/PostFeed';
 import CreatePostModal from '@/components/CreatePostModal';
 import StoriesBar from '@/components/StoriesBar';
 import QuickActions from '@/components/QuickActions';
 
 export default function Home() {
-  const { data: session, status } = useSession();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('feed');
-
-  if (status === 'loading') {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-telegram-blue"></div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-gradient-to-r from-telegram-blue to-whatsapp-green rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-6">
-            🎉
-          </div>
-          <h1 className="text-3xl font-bold text-telegram-text mb-4">Welcome to GenZ Day</h1>
-          <p className="text-telegram-text-secondary mb-8">
-            Join the revolution of ephemeral social sharing. Your moments last just 7 days, making every post special.
-          </p>
-          
-          <div className="space-y-4">
-            <button
-              onClick={() => signIn('google')}
-              className="w-full flex items-center justify-center space-x-3 bg-white border border-telegram-border text-telegram-text rounded-xl py-4 px-6 hover:bg-telegram-border transition-colors"
-            >
-              <span>🔗</span>
-              <span>Continue with Google</span>
-            </button>
-            
-            <button
-              onClick={() => signIn('phone')}
-              className="w-full flex items-center justify-center space-x-3 bg-telegram-blue text-white rounded-xl py-4 px-6 hover:bg-telegram-blue-dark transition-colors"
-            >
-              <span>📱</span>
-              <span>Continue with Phone</span>
-            </button>
-            
-            <button
-              onClick={() => signIn('email')}
-              className="w-full flex items-center justify-center space-x-3 bg-whatsapp-green text-white rounded-xl py-4 px-6 hover:bg-whatsapp-green-dark transition-colors"
-            >
-              <span>✉️</span>
-              <span>Continue with Email</span>
-            </button>
-          </div>
-          
-          <p className="text-sm text-telegram-text-secondary mt-6">
-            By continuing, you agree to our Terms and Privacy Policy
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const [user] = useState({
+    name: 'GenZ User',
+    avatar: 'GZ'
+  });
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
@@ -97,15 +45,15 @@ export default function Home() {
                 👋
               </div>
               <div className="text-left">
-                <h2 className="text-xl font-bold text-telegram-text">Welcome back, {session.user?.name}!</h2>
-                <p className="text-telegram-text-secondary">Your streak: 🔥 3 days in a row</p>
+                <h2 className="text-xl font-bold text-telegram-text">Welcome to GenZ Day!</h2>
+                <p className="text-telegram-text-secondary">Share moments that vanish in 7 days</p>
               </div>
             </div>
             <button 
               onClick={() => setIsCreateModalOpen(true)}
               className="telegram-button px-6 py-3 font-medium"
             >
-              📸 Share a Moment
+              📸 Start Sharing Now
             </button>
           </div>
 
@@ -119,7 +67,7 @@ export default function Home() {
           <div className="telegram-card p-4">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-12 h-12 bg-gradient-to-r from-telegram-blue to-whatsapp-green rounded-full flex items-center justify-center text-white font-bold">
-                {session.user?.name?.[0] || 'U'}
+                {user.avatar}
               </div>
               <button 
                 onClick={() => setIsCreateModalOpen(true)}
@@ -154,6 +102,50 @@ export default function Home() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
       />
+
+      {/* Simple Login Modal */}
+      <LoginModal />
+    </div>
+  );
+}
+
+function LoginModal() {
+  const [showLogin, setShowLogin] = useState(false);
+
+  if (!showLogin) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="telegram-card w-full max-w-md p-6">
+        <h2 className="text-2xl font-bold text-telegram-text mb-4">Join GenZ Day</h2>
+        <p className="text-telegram-text-secondary mb-6">
+          Create an account to start sharing moments
+        </p>
+        
+        <div className="space-y-3">
+          <button className="w-full flex items-center justify-center space-x-3 bg-telegram-blue text-white rounded-lg py-3 px-4 hover:bg-telegram-blue-dark transition-colors">
+            <span>📱</span>
+            <span>Continue with Phone</span>
+          </button>
+          
+          <button className="w-full flex items-center justify-center space-x-3 bg-white border border-telegram-border text-telegram-text rounded-lg py-3 px-4 hover:bg-telegram-border transition-colors">
+            <span>🔗</span>
+            <span>Continue with Google</span>
+          </button>
+          
+          <button className="w-full flex items-center justify-center space-x-3 bg-whatsapp-green text-white rounded-lg py-3 px-4 hover:bg-whatsapp-green-dark transition-colors">
+            <span>✉️</span>
+            <span>Continue with Email</span>
+          </button>
+        </div>
+
+        <button 
+          onClick={() => setShowLogin(false)}
+          className="w-full mt-4 py-3 text-telegram-text-secondary hover:text-telegram-text transition-colors"
+        >
+          Maybe later
+        </button>
+      </div>
     </div>
   );
 }
