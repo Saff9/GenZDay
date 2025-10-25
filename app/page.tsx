@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import PostFeed from '@/components/PostFeed';
 import CreatePostModal from '@/components/CreatePostModal';
+import StoriesBar from '@/components/StoriesBar';
+import QuickActions from '@/components/QuickActions';
 
 export default function Home() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -50,6 +52,41 @@ export default function Home() {
           >
             Start Sharing Now
           </button>
+        </div>
+
+        {/* Stories */}
+        <StoriesBar />
+
+        {/* Quick Actions */}
+        <QuickActions />
+
+        {/* Create Post Card */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 mb-6">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold">
+              YT
+            </div>
+            <button 
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-full py-3 px-4 text-left transition-colors"
+            >
+              What's happening? Share a moment...
+            </button>
+          </div>
+          <div className="flex justify-around border-t border-gray-200 pt-3">
+            <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors">
+              <span>📸</span>
+              <span>Photo/Video</span>
+            </button>
+            <button className="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors">
+              <span>🎵</span>
+              <span>Music</span>
+            </button>
+            <button className="flex items-center space-x-2 text-gray-500 hover:text-orange-500 transition-colors">
+              <span>📝</span>
+              <span>Poll</span>
+            </button>
+          </div>
         </div>
 
         {/* Post Feed */}
