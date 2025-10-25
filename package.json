@@ -30,3 +30,8 @@
     "postcss": "^8.4.31"
   }
 }
+{
+  "dependencies": {
+    "bcryptjs": "^2.4.3"
+  }
+}
