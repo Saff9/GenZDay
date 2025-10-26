@@ -1,21 +1,21 @@
-// Simple session management without NextAuth complications
 'use client';
 
 export interface User {
   id: string;
   name: string;
   email?: string;
-  phone?: string;
-  avatar?: string;
+  avatar: string;
+  isLoggedIn: boolean;
 }
 
+// Simple session management for demo
 export function useSession() {
-  // Simple mock session for demo
   const user: User = {
-    id: '1',
-    name: 'GenZ User',
-    email: 'user@genzday.com',
-    avatar: 'GZ'
+    id: 'user-demo',
+    name: 'Demo User',
+    email: 'demo@genzday.com',
+    avatar: 'DU',
+    isLoggedIn: true
   };
 
   return {
@@ -24,14 +24,14 @@ export function useSession() {
   };
 }
 
-export function signIn(provider: string) {
-  console.log(`Signing in with ${provider}`);
-  // In real app, redirect to auth provider
+export function signIn() {
+  // In real app, this would redirect to auth provider
+  console.log('Signing in...');
   return Promise.resolve();
 }
 
 export function signOut() {
-  console.log('Signing out');
-  // In real app, clear session
+  // In real app, this would clear session
+  console.log('Signing out...');
   return Promise.resolve();
 }
