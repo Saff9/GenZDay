@@ -1,6 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from '@/hooks/useSession';
+import AuthModal from '@/components/AuthModal';
+import UserMenu from '@/components/UserMenu';
 
 interface Post {
   id: string;
@@ -23,7 +26,9 @@ interface Post {
 }
 
 export default function Home() {
+  const { user, status } = useSession();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [newPostCaption, setNewPostCaption] = useState('');
@@ -42,11 +47,9 @@ export default function Home() {
       if (data.success) {
         setPosts(data.data);
       } else {
-        // Fallback demo data
         setPosts(getDemoPosts());
       }
     } catch (error) {
-      console.error('Failed to fetch posts:', error);
       setPosts(getDemoPosts());
     }
     setLoading(false);
@@ -54,7 +57,7 @@ export default function Home() {
 
   const getDemoPosts = (): Post[] => [
     {
-      id: 'demo-1',
+      id: '1',
       userId: 'user-1',
       mediaUrl: 'https://placehold.co/600x400/0088cc/white?text=Welcome+To+GenZ+Day',
       mediaType: 'image',
@@ -70,10 +73,33 @@ export default function Home() {
       likes: 23,
       comments: 5,
       isLiked: false
+    },
+    {
+      id: '2',
+      userId: 'user-2',
+      mediaUrl: 'https://placehold.co/600x400/25d366/white?text=Beach+Day+🏖️',
+      mediaType: 'image',
+      caption: 'Beautiful day at the beach! Perfect weather ☀️',
+      expiresAt: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString(),
+      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      views: 89,
+      user: { 
+        id: 'user-2',
+        name: 'Sarah', 
+        avatar: 'SA'
+      },
+      likes: 45,
+      comments: 8,
+      isLiked: true
     }
   ];
 
   const handleLike = async (postId: string) => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
     try {
       const response = await fetch('/api/posts/like', {
         method: 'POST',
@@ -84,7 +110,6 @@ export default function Home() {
       const data = await response.json();
       
       if (data.success) {
-        // Update local state
         setPosts(posts.map(post => 
           post.id === postId 
             ? { 
@@ -96,7 +121,6 @@ export default function Home() {
         ));
       }
     } catch (error) {
-      console.error('Failed to like post:', error);
       // Fallback: update locally
       setPosts(posts.map(post => 
         post.id === postId 
@@ -111,18 +135,21 @@ export default function Home() {
   };
 
   const handleCreatePost = async () => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
     if (!newPostCaption.trim()) return;
 
     setUploading(true);
     try {
-      // Step 1: Upload file (in demo, we use placeholder)
       const uploadResponse = await fetch('/api/upload', { 
         method: 'POST' 
       });
       const uploadData = await uploadResponse.json();
 
       if (uploadData.success) {
-        // Step 2: Create post
         const postResponse = await fetch('/api/posts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -139,7 +166,6 @@ export default function Home() {
           alert('Post created successfully! 🎉');
           setIsCreateModalOpen(false);
           setNewPostCaption('');
-          // Refresh posts
           fetchPosts();
         }
       }
@@ -147,9 +173,20 @@ export default function Home() {
       alert('Post created successfully! 🎉 (Demo mode)');
       setIsCreateModalOpen(false);
       setNewPostCaption('');
-      fetchPosts(); // Refresh to show new post
+      fetchPosts();
     }
     setUploading(false);
+  };
+
+  const handleSignIn = (provider: string) => {
+    alert(`Signing in with ${provider}... 🔐\n\nIn a real app, this would redirect to authentication.`);
+    setIsAuthModalOpen(false);
+    // In real app: redirect to auth provider
+  };
+
+  const handleSignOut = () => {
+    alert('Signed out successfully! 👋');
+    // In real app: clear session
   };
 
   const calculateTimeLeft = (expiresAt: string) => {
@@ -166,7 +203,7 @@ export default function Home() {
     return `${hours}h left`;
   };
 
-  if (loading) {
+  if (loading || status === 'loading') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
         <div className="text-center">
@@ -192,13 +229,22 @@ export default function Home() {
                 <p className="text-gray-600">Your moments, your week, your way</p>
               </div>
             </div>
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-colors flex items-center space-x-2"
-            >
-              <span>📸</span>
-              <span>Create Post</span>
-            </button>
+            
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => user ? setIsCreateModalOpen(true) : setIsAuthModalOpen(true)}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-colors flex items-center space-x-2"
+              >
+                <span>📸</span>
+                <span>Create Post</span>
+              </button>
+              
+              <UserMenu 
+                user={user}
+                onSignIn={() => setIsAuthModalOpen(true)}
+                onSignOut={handleSignOut}
+              />
+            </div>
           </div>
         </div>
       </header>
@@ -208,22 +254,47 @@ export default function Home() {
         {/* Welcome Section */}
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center mb-8">
           <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white text-4xl mx-auto mb-6">
-            👋
+            {user ? '👋' : '🎉'}
           </div>
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">Welcome to GenZ Day!</h2>
+          <h2 className="text-4xl font-bold text-gray-800 mb-4">
+            {user ? `Welcome back, ${user.name}!` : 'Welcome to GenZ Day!'}
+          </h2>
           <p className="text-xl text-gray-600 mb-6">
-            Share photos and videos that disappear after 7 days. 
-            Connect with friends in real-time.
+            {user 
+              ? 'Ready to share your next moment?' 
+              : 'Share photos and videos that disappear after 7 days. Connect with friends in real-time.'
+            }
           </p>
           <button 
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={() => user ? setIsCreateModalOpen(true) : setIsAuthModalOpen(true)}
             className="bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-bold text-lg py-4 px-8 rounded-xl transition-all transform hover:scale-105"
           >
-            🚀 Start Sharing Now
+            {user ? '📸 Share a Moment' : '🚀 Get Started'}
           </button>
         </div>
 
-        {/* Stats Bar */}
+        {/* User Stats (only when logged in) */}
+        {user && (
+          <div className="grid grid-cols-3 gap-4 mb-8">
+            <div className="bg-white rounded-2xl p-4 text-center shadow-lg">
+              <div className="text-2xl text-blue-500 mb-2">📊</div>
+              <p className="text-sm text-gray-600">Your Posts</p>
+              <p className="text-2xl font-bold text-gray-800">0</p>
+            </div>
+            <div className="bg-white rounded-2xl p-4 text-center shadow-lg">
+              <div className="text-2xl text-green-500 mb-2">❤️</div>
+              <p className="text-sm text-gray-600">Likes Received</p>
+              <p className="text-2xl font-bold text-gray-800">0</p>
+            </div>
+            <div className="bg-white rounded-2xl p-4 text-center shadow-lg">
+              <div className="text-2xl text-purple-500 mb-2">🔥</div>
+              <p className="text-sm text-gray-600">Current Streak</p>
+              <p className="text-2xl font-bold text-gray-800">1 day</p>
+            </div>
+          </div>
+        )}
+
+        {/* Global Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-2xl p-4 text-center shadow-lg">
             <div className="text-2xl text-blue-500 mb-2">📊</div>
@@ -233,7 +304,7 @@ export default function Home() {
           <div className="bg-white rounded-2xl p-4 text-center shadow-lg">
             <div className="text-2xl text-green-500 mb-2">👥</div>
             <p className="text-sm text-gray-600">Active Users</p>
-            <p className="text-2xl font-bold text-gray-800">1</p>
+            <p className="text-2xl font-bold text-gray-800">{user ? '2' : '1'}</p>
           </div>
           <div className="bg-white rounded-2xl p-4 text-center shadow-lg">
             <div className="text-2xl text-purple-500 mb-2">⏰</div>
@@ -250,7 +321,7 @@ export default function Home() {
               <h3 className="text-2xl font-bold text-gray-800 mb-2">No posts yet</h3>
               <p className="text-gray-600 mb-6">Be the first to share a moment!</p>
               <button 
-                onClick={() => setIsCreateModalOpen(true)}
+                onClick={() => user ? setIsCreateModalOpen(true) : setIsAuthModalOpen(true)}
                 className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg"
               >
                 Create First Post
@@ -349,10 +420,10 @@ export default function Home() {
             <div className="p-4">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold">
-                  YT
+                  {user?.name?.[0]?.toUpperCase() || 'U'}
                 </div>
                 <div>
-                  <p className="font-medium text-gray-800">You</p>
+                  <p className="font-medium text-gray-800">{user?.name || 'You'}</p>
                   <p className="text-sm text-gray-500">Post will expire in 7 days</p>
                 </div>
               </div>
@@ -399,10 +470,19 @@ export default function Home() {
         </div>
       )}
 
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSignIn={handleSignIn}
+      />
+
       {/* Footer */}
       <footer className="bg-white border-t mt-12 py-8 text-center text-gray-600">
         <p>Made with ❤️ for GenZ • Your moments, your week, your way</p>
-        <p className="text-sm text-gray-400 mt-2">Phase 1: Enhanced Features Active</p>
+        <p className="text-sm text-gray-400 mt-2">
+          Phase 2: Authentication {user ? '• Logged In' : '• Ready to Sign In'}
+        </p>
       </footer>
     </div>
   );
