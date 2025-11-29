@@ -1,19 +1,7 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 
-// Extend the built-in session types
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-    }
-  }
-}
-
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -40,4 +28,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: '/auth/signin',
   },
-});
+};
+
+// Export the handlers directly
+const { handlers, auth, signIn, signOut } = NextAuth(authOptions);
+export { handlers, auth, signIn, signOut };
