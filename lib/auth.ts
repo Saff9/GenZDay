@@ -1,4 +1,4 @@
-import NextAuth, { type DefaultSession, type NextAuthConfig } from 'next-auth';
+import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 
 // Extend the built-in session types
@@ -9,7 +9,7 @@ declare module "next-auth" {
       name?: string | null;
       email?: string | null;
       image?: string | null;
-    } & DefaultSession['user']
+    }
   }
 }
 
@@ -22,7 +22,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async session({ token, session }: { token: any; session: any }) {
-      // Assign the token properties to session.user safely
       if (session.user) {
         session.user.id = token.sub!;
         session.user.name = token.name;
